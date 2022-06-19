@@ -1,0 +1,142 @@
+{
+	"format_version": "1.8.0",
+	"animations": {
+		"walk": {
+			"loop": true,
+			"bones": {
+				"bone": {
+					"position": {
+						"vector": [0, 0, "Math.sin(time*300)*0.1"]
+					}
+				},
+				"head": {
+					"rotation": {
+						"vector": ["Math.cos(time*600)*2", 0, 0]
+					},
+					"position": {
+						"vector": [0, 0, "Math.sin(time*600)*0.2"]
+					}
+				},
+				"rightwing": {
+					"rotation": {
+						"vector": [0, -22.5, "math.sin(time*600)*10"]
+					}
+				},
+				"leftwing": {
+					"rotation": {
+						"vector": [0, 22.5, "+math.sin(time*600)*-10"]
+					}
+				},
+				"tail": {
+					"rotation": {
+						"vector": ["Math.cos((query.anim_time) * 300) * 8", 0, 0]
+					},
+					"position": {
+						"vector": [0, 0, "Math.sin(time*600)*-0.2"]
+					}
+				},
+				"tailsegment": {
+					"rotation": {
+						"vector": ["Math.cos((query.anim_time - 0.2) * 300) * 8", 0, 0]
+					}
+				},
+				"rightleg": {
+					"rotation": {
+						"vector": ["Math.cos((query.anim_time) * 300) * -20", 0, 0]
+					},
+					"position": {
+						"vector": [0, 0, "Math.cos((query.anim_time) * 300) * -2"]
+					}
+				},
+				"leftleg": {
+					"rotation": {
+						"vector": ["Math.cos((query.anim_time) * 300) * 20", 0, 0]
+					},
+					"position": {
+						"vector": [0, 0, "Math.cos((query.anim_time) * 300) * 2"]
+					}
+				},
+				"wholebody": {
+					"position": {
+						"vector": [0, 0, "Math.sin(time*600)*-0.2"]
+					}
+				}
+			}
+		},
+		"flying": {
+			"loop": true,
+			"bones": {
+				"bone": {
+					"rotation": {
+						"vector": ["Math.cos(time*400)*5", 0, 0]
+					},
+					"position": {
+						"vector": [0, "Math.sin(time*400)*2", 0]
+					}
+				},
+				"rightwing": {
+					"rotation": {
+						"vector": [0, 0, "-60+math.sin(time*1500)*60"]
+					},
+					"position": {
+						"vector": [0.5, 0, 0]
+					}
+				},
+				"leftwing": {
+					"rotation": {
+						"vector": [0, 0, "60+math.sin(time*1500)*-60"]
+					}
+				},
+				"tail": {
+					"rotation": {
+						"vector": ["Math.cos((query.anim_time) * 400) * 8", 0, 0]
+					}
+				},
+				"tailsegment": {
+					"rotation": {
+						"vector": ["Math.cos((query.anim_time - 0.2) * 400) * 8", 0, 0]
+					}
+				},
+				"rightleg": {
+					"rotation": {
+						"vector": [47.5, 0, 0]
+					}
+				},
+				"leftleg": {
+					"rotation": {
+						"vector": [47.5, 0, 0]
+					}
+				}
+			}
+		},
+		"idle": {
+			"loop": true,
+			"bones": {
+				"bone": {
+					"rotation": {
+						"vector": ["Math.cos(time*100)*2", 0, "Math.cos(time*100)*2"]
+					}
+				},
+				"head": {
+					"rotation": {
+						"vector": ["Math.cos(time*120)*3", 0, 0]
+					},
+					"position": {
+						"vector": [0, "Math.sin(time*38)*0.5", 0]
+					}
+				},
+				"tail": {
+					"rotation": {
+						"vector": ["Math.cos((query.anim_time) * 200) * 5", 0, 0]
+					}
+				},
+				"tailsegment": {
+					"rotation": {
+						"vector": ["Math.cos((query.anim_time - 0.2) * 200) * 5", 0, 0]
+					}
+				}
+			}
+		}
+	},
+	"geckolib_format_version": 2
+}
