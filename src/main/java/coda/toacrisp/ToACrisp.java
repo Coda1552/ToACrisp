@@ -1,5 +1,6 @@
 package coda.toacrisp;
 
+import coda.toacrisp.common.entities.Cockatrice;
 import coda.toacrisp.common.entities.Wyvern;
 import coda.toacrisp.registry.TACBlocks;
 import coda.toacrisp.registry.TACEntities;
@@ -38,5 +39,6 @@ public class ToACrisp {
 
     private void createAttributes(EntityAttributeCreationEvent e) {
         e.put(TACEntities.WYVERN.get(), Wyvern.createWyvernAttributes().build());
+        e.put(TACEntities.COCKATRICE.get(), Cockatrice.createCockatriceAttributes().build());
     }
 }

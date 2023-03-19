@@ -2,8 +2,10 @@
   "itemGroup.toacrisp": "To a Crisp",
 
   "entity.toacrisp.wyvern": "Wyvern",
+  "entity.toacrisp.cockatrice": "Cockatrice",
 
   "item.toacrisp.wyvern_spawn_egg": "Wyvern Spawn Egg",
+  "item.toacrisp.cockatrice_spawn_egg": "Cockatrice Spawn Egg",
 
   "block.toacrisp.ash": "Ash",
 

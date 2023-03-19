@@ -1,7 +1,7 @@
 package coda.toacrisp.client.render;
 
 import coda.toacrisp.ToACrisp;
-import coda.toacrisp.client.WModelLayers;
+import coda.toacrisp.client.TACModelLayers;
 import coda.toacrisp.client.model.WyvernModel;
 import coda.toacrisp.common.entities.Wyvern;
 import net.minecraft.client.renderer.RenderType;
@@ -16,7 +16,7 @@ public class WyvernRenderer extends MobRenderer<Wyvern, WyvernModel<Wyvern>> {
     private static final ResourceLocation SADDLE_TEX = new ResourceLocation(ToACrisp.MOD_ID, "textures/entity/wyvern/saddle.png");
 
     public WyvernRenderer(EntityRendererProvider.Context pContext) {
-        super(pContext, new WyvernModel<>(pContext.bakeLayer(WModelLayers.WYVERN)), 1.0F);
+        super(pContext, new WyvernModel<>(pContext.bakeLayer(TACModelLayers.WYVERN)), 1.0F);
         addLayer(new SaddleLayer<>(this, getModel(), SADDLE_TEX));
     }
 

@@ -207,21 +207,21 @@ public class Wyvern extends TamableAnimal implements Saddleable, FlyingAnimal {
     @Override
     public void travel(Vec3 dir) {
         if (this.isVehicle()) {
-            Entity passener = this.getPassengers().get(0);
-            this.setYRot(passener.getYRot());
+            Entity passenger = this.getPassengers().get(0);
+            this.setYRot(passenger.getYRot());
             this.yRotO = this.getYRot();
-            this.setXRot(passener.getXRot() * 0.5F);
+            this.setXRot(passenger.getXRot() * 0.5F);
             this.setRot(this.getYRot(), this.getXRot());
-            this.yBodyRot = passener.getYRot();
-            this.yHeadRot = passener.getYRot();
+            this.yBodyRot = passenger.getYRot();
+            this.yHeadRot = passenger.getYRot();
             if (this.getPersistentData().getInt("flying") != 0 && this.getPersistentData().getInt("timer") <= 0) {
                 double currentSpeed = Math.pow(Math.pow(this.getDeltaMovement().x, 2) + Math.pow(this.getDeltaMovement().z, 2), 0.5);
-                super.travel(new Vec3(0, 0, ((LivingEntity) passener).zza * 3));
+                super.travel(new Vec3(0, 0, ((LivingEntity) passenger).zza * 3));
                 this.setDeltaMovement(new Vec3(this.getDeltaMovement().x , this.getXRot() * -0.04 * currentSpeed, this.getDeltaMovement().z));
             }
             else {
                 this.setSpeed((float) this.getAttributeValue(Attributes.MOVEMENT_SPEED) / (float) 2.5);
-                super.travel(new Vec3(0, 0, ((LivingEntity) passener).zza));
+                super.travel(new Vec3(0, 0, ((LivingEntity) passenger).zza));
             }
             return;
         }

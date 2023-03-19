@@ -1,7 +1,9 @@
 package coda.toacrisp.client;
 
 import coda.toacrisp.ToACrisp;
+import coda.toacrisp.client.model.CockatriceModel;
 import coda.toacrisp.client.model.WyvernModel;
+import coda.toacrisp.client.render.CockatriceRenderer;
 import coda.toacrisp.client.render.WyvernRenderer;
 import coda.toacrisp.registry.TACEntities;
 import net.minecraft.client.renderer.entity.EntityRenderers;
@@ -17,11 +19,13 @@ public class ClientEvents {
     @SubscribeEvent
     public static void clientSetup(final FMLClientSetupEvent e) {
         EntityRenderers.register(TACEntities.WYVERN.get(), WyvernRenderer::new);
+        EntityRenderers.register(TACEntities.COCKATRICE.get(), CockatriceRenderer::new);
     }
 
     @SubscribeEvent
     public static void registerLayers(EntityRenderersEvent.RegisterLayerDefinitions e) {
-        e.registerLayerDefinition(WModelLayers.WYVERN, WyvernModel::createBodyLayer);
+        e.registerLayerDefinition(TACModelLayers.WYVERN, WyvernModel::createBodyLayer);
+        e.registerLayerDefinition(TACModelLayers.COCKATRICE, CockatriceModel::createBodyLayer);
     }
 
 }
