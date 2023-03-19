@@ -4,6 +4,7 @@ import coda.toacrisp.common.entities.Wyvern;
 import coda.toacrisp.registry.TACBlocks;
 import coda.toacrisp.registry.TACEntities;
 import coda.toacrisp.registry.TACItems;
+import coda.toacrisp.registry.TACParticles;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
@@ -28,6 +29,7 @@ public class ToACrisp {
         IEventBus forgeBus = MinecraftForge.EVENT_BUS;
 
         TACItems.ITEMS.register(bus);
+        TACParticles.PARTICLES.register(bus);
         TACBlocks.BLOCKS.register(bus);
         TACEntities.ENTITIES.register(bus);
 

@@ -1,32 +1,28 @@
 package coda.toacrisp.common.entities;
 
-import coda.toacrisp.client.TACKeyBindings;
 import coda.toacrisp.common.entities.goal.FlyingDragonWanderGoal;
 import coda.toacrisp.common.entities.goal.FollowDriverGoal;
 import coda.toacrisp.registry.TACEntities;
 import coda.toacrisp.registry.TACItems;
-import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
-import net.minecraft.util.Mth;
+import net.minecraft.util.RandomSource;
+import net.minecraft.world.DifficultyInstance;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
-import net.minecraft.world.entity.ai.control.MoveControl;
-import net.minecraft.world.entity.ai.goal.FloatGoal;
-import net.minecraft.world.entity.ai.goal.FollowParentGoal;
-import net.minecraft.world.entity.ai.goal.MeleeAttackGoal;
-import net.minecraft.world.entity.ai.goal.WaterAvoidingRandomStrollGoal;
+import net.minecraft.world.entity.ai.control.FlyingMoveControl;
+import net.minecraft.world.entity.ai.goal.*;
 import net.minecraft.world.entity.ai.goal.target.NearestAttackableTargetGoal;
 import net.minecraft.world.entity.ai.navigation.FlyingPathNavigation;
 import net.minecraft.world.entity.ai.navigation.PathNavigation;
@@ -36,10 +32,13 @@ import net.minecraft.world.entity.vehicle.DismountHelper;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.ServerLevelAccessor;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
+import net.minecraftforge.network.PlayMessages;
 import org.jetbrains.annotations.Nullable;
 
 
@@ -51,13 +50,18 @@ public class Wyvern extends TamableAnimal implements Saddleable, FlyingAnimal {
 
     public Wyvern(EntityType<? extends TamableAnimal> pEntityType, Level pLevel) {
         super(pEntityType, pLevel);
-        this.moveControl = new WyvernMoveController();
+        this.moveControl = new FlyingMoveControl(this, 10, true);
+    }
+
+    public Wyvern(PlayMessages.SpawnEntity packet, Level world) {
+        this(TACEntities.WYVERN.get(), world);
     }
 
     public static AttributeSupplier.Builder createWyvernAttributes() {
-        return Mob.createMobAttributes().add(Attributes.MAX_HEALTH, 60.0D).add(Attributes.MOVEMENT_SPEED, 0.225D).add(Attributes.FLYING_SPEED, 0.2D).add(Attributes.ATTACK_DAMAGE, 4.0D);
+        return Mob.createMobAttributes().add(Attributes.MAX_HEALTH, 60.0D).add(Attributes.MOVEMENT_SPEED, 0.225D).add(Attributes.FLYING_SPEED, 0.5D).add(Attributes.ATTACK_DAMAGE, 4.0D);
     }
 
+    // adds the random flying goal, flying = 0 means is on ground, 1 means is flying, -1 means is getting down, while in -1 is more likely to go down than up
     @Override
     protected void registerGoals() {
         this.goalSelector.addGoal(0, new FloatGoal(this));
@@ -66,13 +70,34 @@ public class Wyvern extends TamableAnimal implements Saddleable, FlyingAnimal {
         this.goalSelector.addGoal(2, new FollowParentGoal(this, 1.15D));
         this.goalSelector.addGoal(2, new FollowDriverGoal(this));
         this.goalSelector.addGoal(3, new FlyingDragonWanderGoal(this, 20, 5));
+        this.goalSelector.addGoal(1, new RandomStrollGoal(this, 0.8, 20) {
+            @Override
+            protected Vec3 getPosition() {
+                if(Wyvern.this.getPersistentData().getInt("flying") != 0) {
+                    RandomSource random = Wyvern.this.getRandom();
+                    double dirX = Wyvern.this.getX() + ((random.nextFloat() * 2 - 1) * 10);
+                    double dirY;
+                    if(Wyvern.this.getPersistentData().getInt("flying")==-1) {
+                        dirY = Wyvern.this.getY() + ((random.nextFloat() * 2 - 1) * -10 - 3.5);
+                    } else {
+                        dirY = Wyvern.this.getY() + ((random.nextFloat() * 2 - 1) * 10);
+                    }
+                    double dirZ = Wyvern.this.getZ() + ((random.nextFloat() * 2 - 1) * 10);
+                    return new Vec3(dirX, dirY, dirZ);
+                }
+                else return Wyvern.this.getDeltaMovement();
+            }
+        });
         this.targetSelector.addGoal(0, new NearestAttackableTargetGoal<>(this, Player.class, true, p -> getOwner() != null && !p.is(getOwner())));
+
     }
 
+    // we set timer to 0 when mounting so that works fine in travel method
     @Override
     public InteractionResult mobInteract(Player pPlayer, InteractionHand pHand) {
         if (pPlayer.getItemInHand(pHand).isEmpty() && isTame() && getOwner() != null && getOwner().is(pPlayer) && isSaddled() && getPassengers().isEmpty()) {
             pPlayer.startRiding(this);
+            this.getPersistentData().putInt("timer", 0);
         }
 
         if (pPlayer.getItemInHand(pHand).is(Items.STICK)) {
@@ -93,8 +118,8 @@ public class Wyvern extends TamableAnimal implements Saddleable, FlyingAnimal {
     }
 
     @Override
-    protected PathNavigation createNavigation(Level worldIn) {
-        return new FlyingPathNavigation(this, worldIn);
+    protected PathNavigation createNavigation(Level world) {
+        return new FlyingPathNavigation(this, world);
     }
 
     public boolean isFlying() {
@@ -168,82 +193,76 @@ public class Wyvern extends TamableAnimal implements Saddleable, FlyingAnimal {
         passenger.setPos(pos.x, pos.y, pos.z);
     }
 
+    // we set flying to -1 when spawning so that it doesn't fall immediately if spawned in air
     @Override
-    public void travel(Vec3 vec3d) {
-        boolean flying = this.isFlying();
-        float speed = (float) this.getAttributeValue(flying ? Attributes.FLYING_SPEED : Attributes.MOVEMENT_SPEED);
-
-        if (canBeControlledByRider()) {
-            LivingEntity entity = (LivingEntity) getControllingPassenger();
-            double moveX = entity.xxa * 0.5;
-            double moveY = vec3d.y;
-            double moveZ = entity.zza;
-
-            yHeadRot = entity.yHeadRot;
-            xRot = entity.xRot * 0.65f;
-            yRot = Mth.rotateIfNecessary(yHeadRot, yRot, isFlying() ? 5 : 7);
-
-            if (isControlledByLocalInstance()) {
-                if (isFlying()) {
-                    moveX = vec3d.x;
-                    moveY = Minecraft.getInstance().options.keyJump.isDown() ? 0.5F : TACKeyBindings.DRAGON_DESCEND.isDown() ? -0.5 : 0F;
-                    moveZ = moveZ > 0 ? moveZ : 0;
-                    setSpeed(speed * 0.005F);
-                }
-                else {
-                    speed *= 0.225f;
-                    if (entity.jumping) {
-                        flying = true;
-                        jumpFromGround();
-                    }
-                }
-
-                vec3d = new Vec3(moveX, moveY, moveZ);
-                setSpeed(speed);
-            }
-            else if (entity instanceof Player) {
-                calculateEntityAnimation(this, true);
-                setDeltaMovement(Vec3.ZERO);
-                if (!level.isClientSide && isFlying())
-                    ((ServerPlayer) entity).connection.aboveGroundVehicleTickCount = 0;
-                return;
-            }
-        }
-        if (flying) {
-            this.moveRelative(speed, vec3d);
-            this.move(MoverType.SELF, getDeltaMovement());
-            this.setDeltaMovement(getDeltaMovement().scale(0.91f));
-            this.calculateEntityAnimation(this, true);
-        }
-        else {
-            super.travel(vec3d);
-        }
+    public SpawnGroupData finalizeSpawn(ServerLevelAccessor world, DifficultyInstance difficulty, MobSpawnType reason, @Nullable SpawnGroupData livingdata, @javax.annotation.Nullable CompoundTag tag) {
+        SpawnGroupData retval = super.finalizeSpawn(world, difficulty, reason, livingdata, tag);
+        this.getPersistentData().putInt("flying", -1);
+        return retval;
     }
 
-    public boolean isHighEnough(int altitude) {
-        return this.getAltitude(altitude) >= altitude;
-    }
-
-    public double getAltitude() {
-        return this.getAltitude(level.getHeight());
-    }
-
-    public double getAltitude(int limit) {
-        BlockPos.MutableBlockPos pointer = blockPosition().mutable();
-        int i = 0;
-
-        while(i <= limit && pointer.getY() > level.dimensionType().minY() && !level.getBlockState(pointer).getMaterial().isSolid())
-        {
-            ++i;
-            pointer.setY(blockPosition().getY() - i);
-        }
-
-        return i;
-    }
-
+    // we make the entity look where the player is looking and travel vertically if in flying mode and timer is 0, so that when pressing the jump key to switch to flying mode it doesn't stop the vertical momentum immediately
+    // the faster it goes the more it moves vertically
+    // if walking we slow it down or else it's too fast
     @Override
-    public void tick() {
-        super.tick();
+    public void travel(Vec3 dir) {
+        if (this.isVehicle()) {
+            Entity passener = this.getPassengers().get(0);
+            this.setYRot(passener.getYRot());
+            this.yRotO = this.getYRot();
+            this.setXRot(passener.getXRot() * 0.5F);
+            this.setRot(this.getYRot(), this.getXRot());
+            this.yBodyRot = passener.getYRot();
+            this.yHeadRot = passener.getYRot();
+            if (this.getPersistentData().getInt("flying") != 0 && this.getPersistentData().getInt("timer") <= 0) {
+                double currentSpeed = Math.pow(Math.pow(this.getDeltaMovement().x, 2) + Math.pow(this.getDeltaMovement().z, 2), 0.5);
+                super.travel(new Vec3(0, 0, ((LivingEntity) passener).zza * 3));
+                this.setDeltaMovement(new Vec3(this.getDeltaMovement().x , this.getXRot() * -0.04 * currentSpeed, this.getDeltaMovement().z));
+            }
+            else {
+                this.setSpeed((float) this.getAttributeValue(Attributes.MOVEMENT_SPEED) / (float) 2.5);
+                super.travel(new Vec3(0, 0, ((LivingEntity) passener).zza));
+            }
+            return;
+        }
+        super.travel(dir);
+    }
+
+    // here we handle the flying states,
+    // if not ridden and if going towards the ground it will check for non-air blocks below and if it finds them, switch to walking
+    // if it is on ground or flying, we wait for the timer to be 0, and we switch mode
+    // if it is ridden and on ground and with timer 0 it will switch to walking
+    // if the timer is greater than 0 we just scale it down by 1
+    @Override
+    public void baseTick() {
+        super.baseTick();
+        if(!this.isVehicle()) {
+            if (this.getPersistentData().getInt("flying") == -1) {
+                if (!((this.level.getBlockState(new BlockPos(this.getX(), this.getY() - 2, this.getZ()))).getBlock() == Blocks.AIR || (this.level.getBlockState(new BlockPos(this.getX(), this.getY() - 1, this.getZ()))).getBlock() == Blocks.AIR)) {
+                    this.getPersistentData().putInt("flying", 0);
+                    this.getPersistentData().putInt("timer", 150);
+                }
+            } else if (this.getPersistentData().getInt("timer") == 0) {
+                if (this.getPersistentData().getInt("flying") == 0) {
+                    this.getPersistentData().putInt("flying", 1);
+                    this.getPersistentData().putInt("timer", 100);
+                } else {
+                    this.getPersistentData().putInt("flying", -1);
+                }
+            }
+        } else if (this.onGround && this.getPersistentData().getInt("timer") == 0) {
+            this.getPersistentData().putInt("flying", 0);
+            this.getPersistentData().putInt("timer", -1);
+        }
+        if (this.getPersistentData().getInt("timer") > 0) {
+            this.getPersistentData().putInt("timer", this.getPersistentData().getInt("timer") - 1);
+        }
+    }
+
+    // set no gravity if flying
+    @Override
+    public void setNoGravity(boolean ignored) {
+        super.setNoGravity(this.getPersistentData().getInt("flying") != 0);
     }
 
     @Nullable
@@ -306,45 +325,4 @@ public class Wyvern extends TamableAnimal implements Saddleable, FlyingAnimal {
         return new ItemStack(TACItems.WYVERN_SPAWN_EGG.get());
     }
 
-    private class WyvernMoveController extends MoveControl {
-
-        public WyvernMoveController() {
-            super(Wyvern.this);
-        }
-
-        @Override
-        public void tick() {
-            // original movement behavior if the entity isn't flying
-            if (!isFlying()) {
-                super.tick();
-                return;
-            }
-
-            if (this.operation == MoveControl.Operation.MOVE_TO) {
-                this.operation = MoveControl.Operation.WAIT;
-                double xDif = wantedX - mob.getX();
-                double yDif = wantedY - mob.getY();
-                double zDif = wantedZ - mob.getZ();
-                double sqd = xDif * xDif + yDif * yDif + zDif * zDif;
-                if (sqd < (double) 2.5000003E-7F) {
-                    mob.setYya(0.0F);
-                    mob.setZza(0.0F);
-                    return;
-                }
-
-                double root = Mth.sqrt((float) (xDif * xDif + zDif * zDif));
-                float xDir = (float) (-(Mth.atan2(yDif, root) * (double) (180F / (float) Math.PI)));
-                float yDir = (float) (Mth.atan2(zDif, xDif) * (double) (180F / (float) Math.PI)) - 90.0F;
-                mob.yRot = rotlerp(mob.yRot, yDir, 90.0F);
-                mob.xRot = rotlerp(mob.xRot, xDir, 5f);
-
-                float speed = (float) (speedModifier * mob.getAttributeValue(Attributes.FLYING_SPEED));
-                mob.setSpeed(speed);
-                mob.setYya(yDif > 0.0D ? speed : -speed);
-            } else {
-                mob.setYya(0.0F);
-                mob.setZza(0.0F);
-            }
-        }
-    }
 }

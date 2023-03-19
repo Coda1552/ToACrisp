@@ -11,5 +11,5 @@ import net.minecraftforge.registries.RegistryObject;
 public class TACEntities {
     public static final DeferredRegister<EntityType<?>> ENTITIES = DeferredRegister.create(ForgeRegistries.ENTITY_TYPES, ToACrisp.MOD_ID);
 
-    public static final RegistryObject<EntityType<Wyvern>> WYVERN = ENTITIES.register("wyvern", () -> EntityType.Builder.of(Wyvern::new, MobCategory.CREATURE).sized(1.5F, 1.5F).setTrackingRange(16).updateInterval(1).build("wyvern"));
+    public static final RegistryObject<EntityType<Wyvern>> WYVERN = ENTITIES.register("wyvern", () -> EntityType.Builder.<Wyvern>of(Wyvern::new, MobCategory.CREATURE).sized(1.5F, 1.5F).setTrackingRange(16).updateInterval(1).build("wyvern"));
 }
