@@ -1,6 +1,6 @@
-package coda.toacrisp.common.entities.goal;
+package codyy.toacrisp.common.entities.goal;
 
-import coda.toacrisp.common.entities.Wyvern;
+import codyy.toacrisp.common.entities.Wyvern;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.ai.goal.Goal;
 

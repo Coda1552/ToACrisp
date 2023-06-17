@@ -1,11 +1,11 @@
-package coda.toacrisp.client;
+package codyy.toacrisp.client;
 
-import coda.toacrisp.ToACrisp;
-import coda.toacrisp.client.model.CockatriceModel;
-import coda.toacrisp.client.model.WyvernModel;
-import coda.toacrisp.client.render.CockatriceRenderer;
-import coda.toacrisp.client.render.WyvernRenderer;
-import coda.toacrisp.registry.TACEntities;
+import codyy.toacrisp.ToACrisp;
+import codyy.toacrisp.client.model.CockatriceModel;
+import codyy.toacrisp.client.model.WyvernModel;
+import codyy.toacrisp.client.render.CockatriceRenderer;
+import codyy.toacrisp.client.render.WyvernRenderer;
+import codyy.toacrisp.registry.TACEntities;
 import net.minecraft.client.renderer.entity.EntityRenderers;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.event.EntityRenderersEvent;

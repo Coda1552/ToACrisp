@@ -1,6 +1,6 @@
-package coda.toacrisp.registry;
+package codyy.toacrisp.registry;
 
-import coda.toacrisp.ToACrisp;
+import codyy.toacrisp.ToACrisp;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.SandBlock;

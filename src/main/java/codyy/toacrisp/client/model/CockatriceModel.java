@@ -1,6 +1,6 @@
-package coda.toacrisp.client.model;
+package codyy.toacrisp.client.model;
 
-import coda.toacrisp.common.entities.Cockatrice;
+import codyy.toacrisp.common.entities.Cockatrice;
 import com.google.common.collect.ImmutableList;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;

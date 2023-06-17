@@ -1,19 +1,15 @@
-package coda.toacrisp.common.entities;
+package codyy.toacrisp.common.entities;
 
-import coda.toacrisp.registry.TACEntities;
-import coda.toacrisp.registry.TACItems;
-import com.mojang.math.Vector3f;
-import net.minecraft.Util;
+import codyy.toacrisp.registry.TACEntities;
+import codyy.toacrisp.registry.TACItems;
 import net.minecraft.core.particles.DustParticleOptions;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
-import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.*;
@@ -215,7 +211,7 @@ public class Cockatrice extends TamableAnimal {
     public boolean wantsToAttack(LivingEntity pTarget, LivingEntity pOwner) {
         if (!(pTarget instanceof Creeper) && !(pTarget instanceof Ghast)) {
             if (pTarget instanceof Cockatrice cockatrice) {
-                return !cockatrice.isTame() || cockatrice.getOwner() != pOwner;
+                return !cockatrice.isTame() || cockatrice.getOwnerUUID() != pOwner.getUUID();
             } else if (pTarget instanceof Player && pOwner instanceof Player && !((Player)pOwner).canHarmPlayer((Player)pTarget)) {
                 return false;
             } else if (pTarget instanceof AbstractHorse && ((AbstractHorse)pTarget).isTamed()) {
@@ -243,20 +239,10 @@ public class Cockatrice extends TamableAnimal {
     }
 
     private void createParticles(LivingEntity target) {
-        Vec3[] COLORS2 = Util.make(new Vec3[16], (p_154319_) -> {
-            for(int i = 0; i <= 15; ++i) {
-                float f = (float)i / 10.0F;
-                float f1 = f * 0.3F + (f > 0.0F ? 0.55F : 0.4F);
-                float f2 = Mth.clamp(f * 0.7F - 0.5F, 0.75F, 1.0F);
-                float f3 = Mth.clamp(f * 0.6F - 0.05F, 0.1F, 0.75F);
-                p_154319_[i] = new Vec3(f1, f2, f3);
-            }
-
-        });
         RandomSource random = target.getRandom();
 
         for (int i = 0; i < 3; i++) {
-            target.level.addParticle(new DustParticleOptions(new Vector3f(COLORS2[i]), 1.0F), target.getX() - 0.2d + (random.nextDouble()/2d), target.getY() + (target.getBbHeight() / 2),  target.getZ() - 0.2d + (random.nextDouble()/2d), 0, 0, 0);
+            target.level.addParticle(new DustParticleOptions(Vec3.fromRGB24(0xaef668).toVector3f(), 1.0F), target.getX() - 0.2d + (random.nextDouble()/2d), target.getY() + (target.getBbHeight() / 2),  target.getZ() - 0.2d + (random.nextDouble()/2d), 0, 0, 0);
         }
     }
 
@@ -321,9 +307,8 @@ public class Cockatrice extends TamableAnimal {
                     this.cockatrice.setActiveAttackTarget(target.getId());
                 }
                 else if (this.attackTime >= this.cockatrice.getAttackDuration()) {
-                    float f = 0.0F;
-                    // todo - damage value
-                    target.hurt(DamageSource.mobAttack(this.cockatrice), (float) this.cockatrice.getAttributeValue(Attributes.ATTACK_DAMAGE) * f);
+                    float f = 0.0F; // todo - add damage value
+                    target.hurt(this.cockatrice.m_269291_().m_269333_(this.cockatrice), (float) this.cockatrice.getAttributeValue(Attributes.ATTACK_DAMAGE) * f);
                 }
 
                 super.tick();

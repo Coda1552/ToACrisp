@@ -1,6 +1,6 @@
-package coda.toacrisp.client;
+package codyy.toacrisp.client;
 
-import coda.toacrisp.ToACrisp;
+import codyy.toacrisp.ToACrisp;
 import net.minecraft.client.model.geom.ModelLayerLocation;
 import net.minecraft.resources.ResourceLocation;
 

@@ -1,6 +1,6 @@
-package coda.toacrisp.client.model;
+package codyy.toacrisp.client.model;
 
-import coda.toacrisp.common.entities.Wyvern;
+import codyy.toacrisp.common.entities.Wyvern;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.minecraft.client.model.EntityModel;

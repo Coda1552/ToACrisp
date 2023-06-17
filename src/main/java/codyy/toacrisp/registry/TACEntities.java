@@ -1,8 +1,8 @@
-package coda.toacrisp.registry;
+package codyy.toacrisp.registry;
 
-import coda.toacrisp.ToACrisp;
-import coda.toacrisp.common.entities.Cockatrice;
-import coda.toacrisp.common.entities.Wyvern;
+import codyy.toacrisp.ToACrisp;
+import codyy.toacrisp.common.entities.Cockatrice;
+import codyy.toacrisp.common.entities.Wyvern;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.MobCategory;
 import net.minecraftforge.registries.DeferredRegister;

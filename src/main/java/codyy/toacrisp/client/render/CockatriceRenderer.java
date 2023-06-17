@@ -1,14 +1,12 @@
-package coda.toacrisp.client.render;
+package codyy.toacrisp.client.render;
 
-import coda.toacrisp.ToACrisp;
-import coda.toacrisp.client.TACModelLayers;
-import coda.toacrisp.client.model.CockatriceModel;
-import coda.toacrisp.common.entities.Cockatrice;
+import codyy.toacrisp.ToACrisp;
+import codyy.toacrisp.client.TACModelLayers;
+import codyy.toacrisp.client.model.CockatriceModel;
+import codyy.toacrisp.common.entities.Cockatrice;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
-import com.mojang.math.Matrix3f;
-import com.mojang.math.Matrix4f;
-import com.mojang.math.Vector3f;
+import com.mojang.math.Axis;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.culling.Frustum;
@@ -20,6 +18,8 @@ import net.minecraft.util.Mth;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
+import org.joml.Matrix3f;
+import org.joml.Matrix4f;
 
 public class CockatriceRenderer extends MobRenderer<Cockatrice, CockatriceModel<Cockatrice>> {
     private static final ResourceLocation LOC = new ResourceLocation(ToACrisp.MOD_ID, "textures/entity/cockatrice/cockatrice.png");
@@ -78,8 +78,8 @@ public class CockatriceRenderer extends MobRenderer<Cockatrice, CockatriceModel<
             vec32 = vec32.normalize();
             float f5 = (float)Math.acos(vec32.y);
             float f6 = (float)Math.atan2(vec32.z, vec32.x);
-            stack.mulPose(Vector3f.YP.rotationDegrees((((float)Math.PI / 2F) - f6) * (180F / (float)Math.PI)));
-            stack.mulPose(Vector3f.XP.rotationDegrees(f5 * (180F / (float)Math.PI)));
+            stack.mulPose(Axis.YP.rotationDegrees((((float)Math.PI / 2F) - f6) * (180F / (float)Math.PI)));
+            stack.mulPose(Axis.XP.rotationDegrees(f5 * (180F / (float)Math.PI)));
             float f7 = f1 * 0.05F * -1.5F;
             float f8 = f * f;
             float f11 = Mth.cos(f7 + 2.3561945F) * 0.282F;
@@ -101,9 +101,9 @@ public class CockatriceRenderer extends MobRenderer<Cockatrice, CockatriceModel<
             float f29 = -1.0F + f2;
             float f30 = f4 * 2.5F + f29;
             VertexConsumer vertexconsumer = buffer.getBuffer(BEAM_RENDER_TYPE);
-            PoseStack.Pose posestack$pose = stack.last();
-            Matrix4f matrix4f = posestack$pose.pose();
-            Matrix3f matrix3f = posestack$pose.normal();
+            PoseStack.Pose pose = stack.last();
+            Matrix4f matrix4f = pose.pose();
+            Matrix3f matrix3f = pose.normal();
             vertex(vertexconsumer, matrix4f, matrix3f, f19, f4, f20, 0.4999F, f30);
             vertex(vertexconsumer, matrix4f, matrix3f, f19, 0.0F, f20, 0.4999F, f29);
             vertex(vertexconsumer, matrix4f, matrix3f, f21, 0.0F, f22, 0.0F, f29);

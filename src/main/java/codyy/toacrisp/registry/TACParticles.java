@@ -1,7 +1,7 @@
-package coda.toacrisp.registry;
+package codyy.toacrisp.registry;
 
-import coda.toacrisp.ToACrisp;
-import coda.toacrisp.client.particle.FlameParticle;
+import codyy.toacrisp.ToACrisp;
+import codyy.toacrisp.client.particle.FlameParticle;
 import net.minecraft.core.particles.ParticleType;
 import net.minecraft.core.particles.SimpleParticleType;
 import net.minecraftforge.client.event.RegisterParticleProvidersEvent;

@@ -1,9 +1,9 @@
-package coda.toacrisp.client.render;
+package codyy.toacrisp.client.render;
 
-import coda.toacrisp.ToACrisp;
-import coda.toacrisp.client.TACModelLayers;
-import coda.toacrisp.client.model.WyvernModel;
-import coda.toacrisp.common.entities.Wyvern;
+import codyy.toacrisp.ToACrisp;
+import codyy.toacrisp.client.TACModelLayers;
+import codyy.toacrisp.client.model.WyvernModel;
+import codyy.toacrisp.common.entities.Wyvern;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.entity.MobRenderer;
