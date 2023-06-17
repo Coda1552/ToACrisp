@@ -1,20 +1,15 @@
 package codyy.toacrisp.common.entities;
 
-import codyy.toacrisp.common.entities.goal.FlyingDragonWanderGoal;
-import codyy.toacrisp.common.entities.goal.FollowDriverGoal;
 import codyy.toacrisp.registry.TACEntities;
 import codyy.toacrisp.registry.TACItems;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
-import net.minecraft.util.RandomSource;
-import net.minecraft.world.DifficultyInstance;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.damagesource.DamageSource;
@@ -22,23 +17,22 @@ import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.ai.control.FlyingMoveControl;
-import net.minecraft.world.entity.ai.goal.*;
+import net.minecraft.world.entity.ai.goal.FloatGoal;
+import net.minecraft.world.entity.ai.goal.FollowParentGoal;
+import net.minecraft.world.entity.ai.goal.MeleeAttackGoal;
+import net.minecraft.world.entity.ai.goal.WaterAvoidingRandomStrollGoal;
 import net.minecraft.world.entity.ai.goal.target.NearestAttackableTargetGoal;
 import net.minecraft.world.entity.ai.navigation.FlyingPathNavigation;
 import net.minecraft.world.entity.ai.navigation.PathNavigation;
-import net.minecraft.world.entity.animal.FlyingAnimal;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.vehicle.DismountHelper;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.ServerLevelAccessor;
-import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
-import net.minecraftforge.network.PlayMessages;
 import org.jetbrains.annotations.Nullable;
 
 
@@ -100,7 +94,7 @@ public class Wyvern extends TamableAnimal implements Saddleable, OwnableEntity {
     public void equipSaddle(@Nullable SoundSource soundSource) {
         this.setSaddled(true);
         if (soundSource != null) {
-            this.level.playSound(null, this, SoundEvents.HORSE_SADDLE, soundSource, 0.5F, 1.0F);
+            this.level().playSound(null, this, SoundEvents.HORSE_SADDLE, soundSource, 0.5F, 1.0F);
         }
     }
 
@@ -137,11 +131,10 @@ public class Wyvern extends TamableAnimal implements Saddleable, OwnableEntity {
     }
 
     @Override
-    public void positionRider(Entity passenger) {
+    protected void positionRider(Entity passenger, MoveFunction p_19958_) {
         Vec3 pos = getYawVec(yBodyRot, 0.0F, 0.0F).add(getX(), getY() + 0.9F, getZ());
         passenger.setPos(pos.x, pos.y, pos.z);
     }
-
 
     @Override
     public void travel(Vec3 pTravelVector) {
@@ -179,7 +172,7 @@ public class Wyvern extends TamableAnimal implements Saddleable, OwnableEntity {
             double d3 = this.getBoundingBox().maxY + 0.75D;
 
             while(true) {
-                double d4 = this.level.getBlockFloorHeight(mutable);
+                double d4 = this.level().getBlockFloorHeight(mutable);
                 if ((double)mutable.getY() + d4 > d3) {
                     break;
                 }
@@ -187,7 +180,7 @@ public class Wyvern extends TamableAnimal implements Saddleable, OwnableEntity {
                 if (DismountHelper.isBlockFloorValid(d4)) {
                     AABB aabb = pPassenger.getLocalBoundsForPose(pose);
                     Vec3 vec3 = new Vec3(d0, (double)mutable.getY() + d4, d2);
-                    if (DismountHelper.canDismountTo(this.level, pPassenger, aabb.move(vec3))) {
+                    if (DismountHelper.canDismountTo(this.level(), pPassenger, aabb.move(vec3))) {
                         pPassenger.setPose(pose);
                         return vec3;
                     }

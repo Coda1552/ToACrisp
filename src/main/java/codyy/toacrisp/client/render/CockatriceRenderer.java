@@ -66,7 +66,7 @@ public class CockatriceRenderer extends MobRenderer<Cockatrice, CockatriceModel<
                 return;
             }
             float f = cockatrice.getAttackAnimationScale(p_114831_);
-            float f1 = (float)cockatrice.level.getGameTime() + p_114831_;
+            float f1 = (float)cockatrice.level().getGameTime() + p_114831_;
             float f2 = f1 * 0.5F % 1.0F;
             float f3 = cockatrice.getEyeHeight();
             stack.pushPose();

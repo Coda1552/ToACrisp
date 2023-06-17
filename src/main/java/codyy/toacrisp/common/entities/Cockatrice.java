@@ -104,7 +104,7 @@ public class Cockatrice extends TamableAnimal {
         ItemStack itemstack = pPlayer.getItemInHand(pHand);
         Item item = itemstack.getItem();
 
-        if (!level.isClientSide) {
+        if (!level().isClientSide) {
             if (this.isTame()) {
                 if (this.isFood(itemstack) && this.getHealth() < this.getMaxHealth()) {
                     if (!pPlayer.getAbilities().instabuild) {
@@ -140,9 +140,9 @@ public class Cockatrice extends TamableAnimal {
                     this.navigation.stop();
                     this.setTarget(null);
                     this.setOrderedToSit(true);
-                    this.level.broadcastEntityEvent(this, (byte)7);
+                    this.level().broadcastEntityEvent(this, (byte)7);
                 } else {
-                    this.level.broadcastEntityEvent(this, (byte)6);
+                    this.level().broadcastEntityEvent(this, (byte)6);
                 }
 
                 return InteractionResult.SUCCESS;
@@ -179,12 +179,12 @@ public class Cockatrice extends TamableAnimal {
         if (!this.hasActiveAttackTarget()) {
             return null;
         }
-        else if (this.level.isClientSide) {
+        else if (this.level().isClientSide) {
             if (this.clientSideCachedAttackTarget != null) {
                 return this.clientSideCachedAttackTarget;
             }
             else {
-                Entity entity = this.level.getEntity(this.entityData.get(DATA_ID_ATTACK_TARGET));
+                Entity entity = this.level().getEntity(this.entityData.get(DATA_ID_ATTACK_TARGET));
                 if (entity instanceof LivingEntity) {
                     this.clientSideCachedAttackTarget = (LivingEntity)entity;
                     return this.clientSideCachedAttackTarget;
@@ -242,7 +242,7 @@ public class Cockatrice extends TamableAnimal {
         RandomSource random = target.getRandom();
 
         for (int i = 0; i < 3; i++) {
-            target.level.addParticle(new DustParticleOptions(Vec3.fromRGB24(0xaef668).toVector3f(), 1.0F), target.getX() - 0.2d + (random.nextDouble()/2d), target.getY() + (target.getBbHeight() / 2),  target.getZ() - 0.2d + (random.nextDouble()/2d), 0, 0, 0);
+            target.level().addParticle(new DustParticleOptions(Vec3.fromRGB24(0xaef668).toVector3f(), 1.0F), target.getX() - 0.2d + (random.nextDouble()/2d), target.getY() + (target.getBbHeight() / 2),  target.getZ() - 0.2d + (random.nextDouble()/2d), 0, 0, 0);
         }
     }
 
@@ -308,7 +308,7 @@ public class Cockatrice extends TamableAnimal {
                 }
                 else if (this.attackTime >= this.cockatrice.getAttackDuration()) {
                     float f = 0.0F; // todo - add damage value
-                    target.hurt(this.cockatrice.m_269291_().m_269333_(this.cockatrice), (float) this.cockatrice.getAttributeValue(Attributes.ATTACK_DAMAGE) * f);
+                    target.hurt(this.cockatrice.damageSources().mobAttack(this.cockatrice), (float) this.cockatrice.getAttributeValue(Attributes.ATTACK_DAMAGE) * f);
                 }
 
                 super.tick();

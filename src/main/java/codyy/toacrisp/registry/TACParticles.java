@@ -22,7 +22,7 @@ public class TACParticles {
 
         @SubscribeEvent(priority = EventPriority.LOWEST)
         public static void registerParticleTypes(RegisterParticleProvidersEvent e) {
-            e.register(FLAME.get(), FlameParticle.Provider::new);
+            e.registerSpriteSet(FLAME.get(), FlameParticle.Provider::new);
         }
     }
 }
